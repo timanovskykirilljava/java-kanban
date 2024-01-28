@@ -1,27 +1,26 @@
 package model;
 
+import util.Status;
+
 public class Subtask extends Task {
-    Epic epic;
+    private final Integer epicId;
 
-    public Subtask(Epic epic, String name) {
-        super(name);
-        this.epic = epic;
+    public Subtask(String name, Status status, String description, Integer epicId) {
+        super(name, status, description);
+        this.epicId = epicId;
     }
 
-    public Epic getEpic() {
-        return epic;
+    public Integer getEpicId() {
+        return epicId;
     }
 
-    public void setEpic(Epic epic) {
-        this.epic = epic;
-    }
 
     @Override
     public String toString() {
         return "Subtask{" +
                 "id= " + getId() + ", " +
                 "name= " + getName() + ", " +
-                "epic= " + epic.getId() + ", " +
+                "epicId= " + getEpicId() + ", " +
                 "status=" + getStatus() + " " +
                 '}';
     }
