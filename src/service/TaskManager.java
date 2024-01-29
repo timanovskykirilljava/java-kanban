@@ -49,12 +49,13 @@ public class TaskManager {
 
     public Subtask createSubtask(Subtask subtask) {
         Integer epicId = subtask.getEpicId();
+        Epic epic = epics.get(epicId);
         subtask.setId(generateId());
         subtasks.put(subtask.getId(), subtask);
-        List<Integer> subtaskIds = epics.get(subtask.getEpicId()).getSubtasks();
+        List<Integer> subtaskIds = epic.getSubtasks();
 
         subtaskIds.add(subtask.getId());
-        calculateEpicStatus(epics.get(epicId));
+        calculateEpicStatus(epic);
         return subtask;
     }
 
@@ -68,12 +69,12 @@ public class TaskManager {
     }
 
     public void deleteSubtask(int id) {
-        Subtask subtask = subtasks.get(id);
-        List<Integer> subtaskIds = epics.get(subtask.getEpicId()).getSubtasks();
+        Subtask subtask = subtasks.remove(id);
+        Epic epic = epics.get(subtask.getEpicId());
+        List<Integer> subtaskIds = epic.getSubtasks();
 
         subtaskIds.remove(subtask.getId());
-        subtasks.remove(id);
-        calculateEpicStatus(epics.get(subtask.getEpicId()));
+        calculateEpicStatus(epic);
     }
 
     public List<Subtask> getAllSubtasks() {
@@ -83,6 +84,7 @@ public class TaskManager {
     public void removeAllSubtasks() {
         subtasks.clear();
         for (Epic epic : epics.values()) {
+            epic.getSubtasks().clear();
             calculateEpicStatus(epic);
         }
     }
@@ -123,7 +125,7 @@ public class TaskManager {
         removeAllSubtasks();
     }
 
-    public void calculateEpicStatus(Epic epic) {
+    private void calculateEpicStatus(Epic epic) {
         int doneTaskCounter = 0;
         int newTaskCounter = 0;
         List<Integer> subtaskIdList = epic.getSubtasks();
@@ -133,21 +135,18 @@ public class TaskManager {
                 doneTaskCounter++;
             } else if (subtasks.get(subtaskId).getStatus() == Status.NEW) {
                 newTaskCounter++;
+            } else {
+                epic.setStatus(Status.IN_PROGRESS);
+                return;
             }
-        }
-
-        if (subtaskIdList.isEmpty()) {
-            epic.setStatus(Status.NEW);
-        } else {
-            epic.setStatus(Status.IN_PROGRESS);
-        }
-
-        if (doneTaskCounter == subtaskIdList.size()) {
-            epic.setStatus(Status.DONE);
         }
 
         if (newTaskCounter == subtaskIdList.size()) {
             epic.setStatus(Status.NEW);
+        } else if (doneTaskCounter == subtaskIdList.size()) {
+            epic.setStatus(Status.DONE);
+        } else {
+            epic.setStatus(Status.IN_PROGRESS);
         }
     }
 
