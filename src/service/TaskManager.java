@@ -129,11 +129,13 @@ public class TaskManager {
         int doneTaskCounter = 0;
         int newTaskCounter = 0;
         List<Integer> subtaskIdList = epic.getSubtasks();
+        Status subtaskStatus = null;
 
         for (int subtaskId : subtaskIdList) {
-            if (subtasks.get(subtaskId).getStatus() == Status.DONE) {
+            subtaskStatus = subtasks.get(subtaskId).getStatus();
+            if (subtaskStatus == Status.DONE) {
                 doneTaskCounter++;
-            } else if (subtasks.get(subtaskId).getStatus() == Status.NEW) {
+            } else if (subtaskStatus == Status.NEW) {
                 newTaskCounter++;
             } else {
                 epic.setStatus(Status.IN_PROGRESS);
